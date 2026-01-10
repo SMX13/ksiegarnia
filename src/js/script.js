@@ -9,15 +9,15 @@ const templates = {
 };
 
 class BooksList {
-constructor() {
-  this.data = dataSource.books;
-  this.filters = [];
-  this.favoriteBooks = [];
+  constructor() {
+    this.data = dataSource.books;
+    this.filters = [];
+    this.favoriteBooks = [];
 
-  this.getElements();
-  this.render();
-  this.initActions();
-}
+    this.getElements();
+    this.render();
+    this.initActions();
+  }
 
   getElements() {
     const thisApp = this;
@@ -79,29 +79,29 @@ constructor() {
 
 
   filterBooks() {
-  const thisApp = this;
+    const thisApp = this;
 
-  for (let book of thisApp.data) {
-    let shouldBeHidden = false;
+    for (let book of thisApp.data) {
+      let shouldBeHidden = false;
 
-    for (let filter of thisApp.filters) {
-      if (!book.details[filter]) {
-        shouldBeHidden = true;
-        break;
+      for (let filter of thisApp.filters) {
+        if (!book.details[filter]) {
+          shouldBeHidden = true;
+          break;
+        }
+      }
+
+      const bookElement = document.querySelector(
+        `.book__image[data-id="${book.id}"]`
+      );
+
+      if (shouldBeHidden) {
+        bookElement.classList.add('hidden');
+      } else {
+        bookElement.classList.remove('hidden');
       }
     }
-
-    const bookElement = document.querySelector(
-      `.book__image[data-id="${book.id}"]`
-    );
-
-    if (shouldBeHidden) {
-      bookElement.classList.add('hidden');
-    } else {
-      bookElement.classList.remove('hidden');
-    }
   }
-}
 
 
 
