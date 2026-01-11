@@ -2,7 +2,6 @@
 
 'use strict';
 
-import { utils } from './functions.js';
 
 const templates = {
   book: Handlebars.compile(
@@ -90,3 +89,10 @@ class BooksList {
 }
 
 new BooksList();
+
+fetch('http://localhost:3131/bookings')
+  .then(response => response.json())
+  .then(data => {
+    console.log('API bookings:', data);
+  });
+
