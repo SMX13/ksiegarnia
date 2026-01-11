@@ -1,6 +1,8 @@
-/* global dataSource, Handlebars, utils */
+/* global Handlebars, dataSource */
 
 'use strict';
+
+import { utils } from './functions.js';
 
 const templates = {
   book: Handlebars.compile(
@@ -20,91 +22,71 @@ class BooksList {
   }
 
   getElements() {
-    const thisApp = this;
-
-    thisApp.dom = {};
-    thisApp.dom.booksList = document.querySelector('.books-list');
-    thisApp.dom.filters = document.querySelectorAll('.filters input');
+    this.dom = {};
+    this.dom.booksList = document.querySelector('.books-list');
+    this.dom.filters = document.querySelectorAll('.filters input');
   }
 
   render() {
-    const thisApp = this;
-
-    for (let book of thisApp.data) {
+    for (const book of this.data) {
       const generatedHTML = templates.book(book);
       const element = utils.createDOMFromHTML(generatedHTML);
-      thisApp.dom.booksList.appendChild(element);
+      this.dom.booksList.appendChild(element);
     }
   }
 
   initActions() {
-    const thisApp = this;
+    for (const checkbox of this.dom.filters) {
+      checkbox.addEventListener('change', event => {
+        const value = event.target.value;
 
-    for (let checkbox of thisApp.dom.filters) {
-      checkbox.addEventListener('change', function(event) {
-        const clickedCheckbox = event.target;
-
-        if (clickedCheckbox.checked) {
-          thisApp.filters.push(clickedCheckbox.value);
+        if (event.target.checked) {
+          this.filters.push(value);
         } else {
-          const index = thisApp.filters.indexOf(clickedCheckbox.value);
-          thisApp.filters.splice(index, 1);
+          const index = this.filters.indexOf(value);
+          this.filters.splice(index, 1);
         }
-        thisApp.filterBooks();
+
+        this.filterBooks();
       });
     }
-    thisApp.dom.booksList.addEventListener('dblclick', function(event) {
+
+    this.dom.booksList.addEventListener('dblclick', event => {
       event.preventDefault();
 
-      const bookImage = event.target.offsetParent;
+      const bookImage = event.target.closest('.book__image');
+      if (!bookImage) return;
 
-      if (!bookImage.classList.contains('book__image')) {
-        return;
-      }
+      const bookId = bookImage.dataset.id;
 
-      const bookId = bookImage.getAttribute('data-id');
-
-      if (thisApp.favoriteBooks.includes(bookId)) {
-        const index = thisApp.favoriteBooks.indexOf(bookId);
-        thisApp.favoriteBooks.splice(index, 1);
+      if (this.favoriteBooks.includes(bookId)) {
+        this.favoriteBooks = this.favoriteBooks.filter(id => id !== bookId);
         bookImage.classList.remove('favorite');
       } else {
-        thisApp.favoriteBooks.push(bookId);
+        this.favoriteBooks.push(bookId);
         bookImage.classList.add('favorite');
       }
     });
-
-    
   }
 
-
   filterBooks() {
-    const thisApp = this;
-
-    for (let book of thisApp.data) {
+    for (const book of this.data) {
       let shouldBeHidden = false;
 
-      for (let filter of thisApp.filters) {
+      for (const filter of this.filters) {
         if (!book.details[filter]) {
           shouldBeHidden = true;
           break;
         }
       }
 
-      const bookElement = document.querySelector(
+      const bookImage = document.querySelector(
         `.book__image[data-id="${book.id}"]`
       );
 
-      if (shouldBeHidden) {
-        bookElement.classList.add('hidden');
-      } else {
-        bookElement.classList.remove('hidden');
-      }
+      bookImage.classList.toggle('hidden', shouldBeHidden);
     }
   }
-
-
-
 }
 
 new BooksList();
